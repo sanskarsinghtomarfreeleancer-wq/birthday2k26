@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Still Us</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="is-locked">
+  <div id="background-system" aria-hidden="true">
+    <div id="bg-layer-a" class="bg-layer"></div>
+    <div id="bg-layer-b" class="bg-layer"></div>
+    <div id="grain-overlay"></div>
+    <div id="global-hearts" class="heart-field"></div>
+    <div id="sparkle-field" class="sparkle-field"></div>
+    <div id="shooting-star-layer" aria-hidden="true"></div>
+    <div id="memory-weather-layer" aria-hidden="true"></div>
+  </div>
+
+  <div id="interaction-layer" aria-hidden="true"></div>
+  <canvas id="constellation-canvas" aria-hidden="true"></canvas>
+  <p id="constellation-tip" class="constellation-tip">The sky is sleeping. Unlock it to draw constellations.</p>
+
+  <div id="egg-hud" class="egg-hud" aria-live="polite">
+    <p class="egg-count">🥚 <span id="egg-count-value">0</span> / 50</p>
+    <p id="egg-hint" class="egg-hint">Find hidden moments. Every tiny action matters.</p>
+    <div class="secret-controls">
+      <button id="constellation-unlock-btn" type="button" class="secret-pill">Wake the sky</button>
+      <button id="whisper-btn" type="button" class="secret-pill">Whisper</button>
+      <button id="egg-hint-btn" type="button" class="secret-pill">Hint</button>
+    </div>
+  </div>
+
+  <div id="lock-screen">
+    <div id="lock-hearts" class="heart-field"></div>
+    <div id="unlock-burst" aria-hidden="true"></div>
+    <div id="lock-panel" class="lock-panel">
+      <div class="lock-left">
+        <figure class="polaroid">
+          <img src="Assets/Image/Her/Her.jpg" alt="Warm memory frame">
+          <figcaption id="lock-caption"></figcaption>
+        </figure>
+        <svg class="decorative-bow" viewBox="0 0 140 90" aria-hidden="true">
+          <path d="M70 45c14-14 32-31 52-28-3 16-11 31-27 39 13 7 22 21 25 34-21 2-38-13-50-27-11 14-30 29-50 27 3-13 11-27 24-34C28 48 21 33 18 17c20-3 38 14 52 28z" />
+          <circle cx="70" cy="45" r="10" />
+        </svg>
+        <button id="secret-heart" type="button" class="secret-heart" aria-label="Tiny hidden heart">♥</button>
+      </div>
+
+      <div class="lock-right">
+        <h1>Enter the passcode</h1>
+        <p id="lock-subtitle" class="lock-subtitle"></p>
+
+        <div id="heart-indicators" class="heart-indicators" aria-hidden="true">
+          <span class="heart-indicator"></span>
+          <span class="heart-indicator"></span>
+          <span class="heart-indicator"></span>
+          <span class="heart-indicator"></span>
+        </div>
+
+        <p id="error-message" class="error-message" aria-live="polite"></p>
+
+        <div id="keypad" class="keypad" aria-label="Passcode keypad">
+          <button type="button" class="keypad-key" data-value="1">1</button>
+          <button type="button" class="keypad-key" data-value="2">2</button>
+          <button type="button" class="keypad-key" data-value="3">3</button>
+          <button type="button" class="keypad-key" data-value="4">4</button>
+          <button type="button" class="keypad-key" data-value="5">5</button>
+          <button type="button" class="keypad-key" data-value="6">6</button>
+          <button type="button" class="keypad-key" data-value="7">7</button>
+          <button type="button" class="keypad-key" data-value="8">8</button>
+          <button type="button" class="keypad-key" data-value="9">9</button>
+          <button type="button" class="keypad-key decorative" data-value="*">*</button>
+          <button type="button" class="keypad-key" data-value="0">0</button>
+          <button type="button" class="keypad-key decorative" data-value="#">#</button>
+        </div>
+      </div>
+    </div>
+    <p id="lock-secret-message" class="lock-secret-message"></p>
+  </div>
+
+  <aside id="waypoint-nav" aria-label="Story waypoints">
+    <div class="progress-rail" aria-hidden="true">
+      <div id="progress-fill"></div>
+    </div>
+    <div class="waypoint-list">
+      <div class="waypoint-item" data-parent="start">
+        <button type="button" class="waypoint active" data-target="start" aria-expanded="false" aria-controls="sub-waypoints-start"><span class="waypoint-dot"></span><span class="waypoint-label">Start</span></button>
+        <div id="sub-waypoints-start" class="sub-waypoint-list" role="group" aria-label="Start micro moments">
+          <button type="button" class="sub-waypoint" data-parent="start" data-sub-id="start-1" data-anchor="start-anchor-1" aria-label="Start micro moment 1"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="start" data-sub-id="start-2" data-anchor="start-anchor-2" aria-label="Start micro moment 2"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="start" data-sub-id="start-3" data-anchor="start-anchor-3" aria-label="Start micro moment 3"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint hidden-sub" data-parent="start" data-sub-id="start-secret" data-anchor="start-anchor-secret" data-hidden="true" data-unlock-rule="hover" aria-label="Start hidden micro moment"><span aria-hidden="true">♥</span></button>
+        </div>
+      </div>
+      <div class="waypoint-item" data-parent="letters">
+        <button type="button" class="waypoint" data-target="letters" aria-expanded="false" aria-controls="sub-waypoints-letters"><span class="waypoint-dot"></span><span class="waypoint-label">Letters</span></button>
+        <div id="sub-waypoints-letters" class="sub-waypoint-list" role="group" aria-label="Letters micro moments">
+          <button type="button" class="sub-waypoint" data-parent="letters" data-sub-id="letters-1" data-anchor="letters-anchor-1" aria-label="Letters micro moment 1"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="letters" data-sub-id="letters-2" data-anchor="letters-anchor-2" aria-label="Letters micro moment 2"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="letters" data-sub-id="letters-3" data-anchor="letters-anchor-3" aria-label="Letters micro moment 3"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint hidden-sub" data-parent="letters" data-sub-id="letters-secret" data-anchor="letters-anchor-secret" data-hidden="true" data-unlock-rule="clicks" aria-label="Letters hidden micro moment"><span aria-hidden="true">♥</span></button>
+        </div>
+      </div>
+      <div class="waypoint-item" data-parent="memories">
+        <button type="button" class="waypoint" data-target="memories" aria-expanded="false" aria-controls="sub-waypoints-memories"><span class="waypoint-dot"></span><span class="waypoint-label">Memories</span></button>
+        <div id="sub-waypoints-memories" class="sub-waypoint-list" role="group" aria-label="Memories micro moments">
+          <button type="button" class="sub-waypoint" data-parent="memories" data-sub-id="memories-1" data-anchor="memories-anchor-1" aria-label="Memories micro moment 1"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="memories" data-sub-id="memories-2" data-anchor="memories-anchor-2" aria-label="Memories micro moment 2"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="memories" data-sub-id="memories-3" data-anchor="memories-anchor-3" aria-label="Memories micro moment 3"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint hidden-sub" data-parent="memories" data-sub-id="memories-secret" data-anchor="memories-anchor-secret" data-hidden="true" data-unlock-rule="idle" aria-label="Memories hidden micro moment"><span aria-hidden="true">★</span></button>
+        </div>
+      </div>
+      <div class="waypoint-item" data-parent="pause">
+        <button type="button" class="waypoint" data-target="pause" aria-expanded="false" aria-controls="sub-waypoints-pause"><span class="waypoint-dot"></span><span class="waypoint-label">Pause</span></button>
+        <div id="sub-waypoints-pause" class="sub-waypoint-list" role="group" aria-label="Pause micro moments">
+          <button type="button" class="sub-waypoint" data-parent="pause" data-sub-id="pause-1" data-anchor="pause-anchor-1" aria-label="Pause micro moment 1"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="pause" data-sub-id="pause-2" data-anchor="pause-anchor-2" aria-label="Pause micro moment 2"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="pause" data-sub-id="pause-3" data-anchor="pause-anchor-3" aria-label="Pause micro moment 3"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint hidden-sub" data-parent="pause" data-sub-id="pause-secret" data-anchor="pause-anchor-secret" data-hidden="true" data-unlock-rule="pattern" aria-label="Pause hidden micro moment"><span aria-hidden="true">★</span></button>
+        </div>
+      </div>
+      <div class="waypoint-item" data-parent="stillus">
+        <button type="button" class="waypoint" data-target="stillus" aria-expanded="false" aria-controls="sub-waypoints-stillus"><span class="waypoint-dot"></span><span class="waypoint-label">Still Us</span></button>
+        <div id="sub-waypoints-stillus" class="sub-waypoint-list" role="group" aria-label="Still Us micro moments">
+          <button type="button" class="sub-waypoint" data-parent="stillus" data-sub-id="stillus-1" data-anchor="stillus-anchor-1" aria-label="Still Us micro moment 1"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="stillus" data-sub-id="stillus-2" data-anchor="stillus-anchor-2" aria-label="Still Us micro moment 2"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="stillus" data-sub-id="stillus-3" data-anchor="stillus-anchor-3" aria-label="Still Us micro moment 3"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint hidden-sub" data-parent="stillus" data-sub-id="stillus-secret" data-anchor="stillus-anchor-secret" data-hidden="true" data-unlock-rule="hover" aria-label="Still Us hidden micro moment"><span aria-hidden="true">♥</span></button>
+        </div>
+      </div>
+      <div class="waypoint-item" data-parent="ending">
+        <button type="button" class="waypoint" id="final-waypoint" data-target="ending" aria-expanded="false" aria-controls="sub-waypoints-ending"><span class="waypoint-dot"></span><span class="waypoint-label">Ending</span></button>
+        <div id="sub-waypoints-ending" class="sub-waypoint-list" role="group" aria-label="Ending micro moments">
+          <button type="button" class="sub-waypoint" data-parent="ending" data-sub-id="ending-1" data-anchor="ending-anchor-1" aria-label="Ending micro moment 1"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="ending" data-sub-id="ending-2" data-anchor="ending-anchor-2" aria-label="Ending micro moment 2"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint" data-parent="ending" data-sub-id="ending-3" data-anchor="ending-anchor-3" aria-label="Ending micro moment 3"><span aria-hidden="true">•</span></button>
+          <button type="button" class="sub-waypoint hidden-sub" data-parent="ending" data-sub-id="ending-secret" data-anchor="ending-anchor-secret" data-hidden="true" data-unlock-rule="clicks" aria-label="Ending hidden micro moment"><span aria-hidden="true">♥</span></button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main id="story-app">
+    <section id="start" class="story-section">
+      <div class="sub-anchor-group" aria-hidden="true">
+        <span id="start-anchor-1" class="sub-anchor-marker" data-depth="1"></span>
+        <span id="start-anchor-2" class="sub-anchor-marker" data-depth="2"></span>
+        <span id="start-anchor-3" class="sub-anchor-marker" data-depth="3"></span>
+        <span id="start-anchor-secret" class="sub-anchor-marker" data-depth="4"></span>
+      </div>
+      <div class="glass-card breathing">
+        <div id="start-lines" class="line-group"></div>
+      </div>
+    </section>
+
+    <section id="letters" class="story-section">
+      <div class="sub-anchor-group" aria-hidden="true">
+        <span id="letters-anchor-1" class="sub-anchor-marker" data-depth="1"></span>
+        <span id="letters-anchor-2" class="sub-anchor-marker" data-depth="2"></span>
+        <span id="letters-anchor-3" class="sub-anchor-marker" data-depth="3"></span>
+        <span id="letters-anchor-secret" class="sub-anchor-marker" data-depth="4"></span>
+      </div>
+      <div class="glass-card">
+        <h2 id="letters-title" class="section-title reveal-line"></h2>
+        <div id="letters-stack" class="letters-stack"></div>
+      </div>
+    </section>
+
+    <section id="memories" class="story-section">
+      <div class="sub-anchor-group" aria-hidden="true">
+        <span id="memories-anchor-1" class="sub-anchor-marker" data-depth="1"></span>
+        <span id="memories-anchor-2" class="sub-anchor-marker" data-depth="2"></span>
+        <span id="memories-anchor-3" class="sub-anchor-marker" data-depth="3"></span>
+        <span id="memories-anchor-secret" class="sub-anchor-marker" data-depth="4"></span>
+      </div>
+      <div class="glass-card">
+        <h2 id="memories-title" class="section-title reveal-line"></h2>
+        <div id="memory-stack" class="memory-stack"></div>
+      </div>
+    </section>
+
+    <section id="pause" class="story-section quiet-section">
+      <div class="sub-anchor-group" aria-hidden="true">
+        <span id="pause-anchor-1" class="sub-anchor-marker" data-depth="1"></span>
+        <span id="pause-anchor-2" class="sub-anchor-marker" data-depth="2"></span>
+        <span id="pause-anchor-3" class="sub-anchor-marker" data-depth="3"></span>
+        <span id="pause-anchor-secret" class="sub-anchor-marker" data-depth="4"></span>
+      </div>
+      <div class="glass-card pause-card">
+        <p id="pause-line" class="reveal-line pause-line"></p>
+      </div>
+    </section>
+
+    <section id="stillus" class="story-section">
+      <div class="sub-anchor-group" aria-hidden="true">
+        <span id="stillus-anchor-1" class="sub-anchor-marker" data-depth="1"></span>
+        <span id="stillus-anchor-2" class="sub-anchor-marker" data-depth="2"></span>
+        <span id="stillus-anchor-3" class="sub-anchor-marker" data-depth="3"></span>
+        <span id="stillus-anchor-secret" class="sub-anchor-marker" data-depth="4"></span>
+      </div>
+      <div class="glass-card breathing">
+        <div id="stillus-lines" class="line-group"></div>
+      </div>
+    </section>
+
+    <section id="ending" class="story-section">
+      <div class="sub-anchor-group" aria-hidden="true">
+        <span id="ending-anchor-1" class="sub-anchor-marker" data-depth="1"></span>
+        <span id="ending-anchor-2" class="sub-anchor-marker" data-depth="2"></span>
+        <span id="ending-anchor-3" class="sub-anchor-marker" data-depth="3"></span>
+        <span id="ending-anchor-secret" class="sub-anchor-marker" data-depth="4"></span>
+      </div>
+      <div class="glass-card ending-card">
+        <div id="ending-lines" class="line-group"></div>
+        <p id="final-secret-line" class="final-secret-line"></p>
+        <div class="bonus-actions">
+          <button id="fake-ending-btn" type="button" class="soft-button">This is the end.</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="bonus-chapter" class="story-section bonus-chapter" data-gradient="linear-gradient(130deg, #2d1a39 0%, #6e3d74 45%, #f3b1cb 100%)">
+      <div class="glass-card bonus-card">
+        <h2 class="section-title">A Little Extra Sky</h2>
+        <p id="countdown-line" class="bonus-line">Calculating the next birthday glow...</p>
+        <p id="mood-line" class="bonus-subline">Tonight feels soft and cinematic.</p>
+        <article id="promise-card" class="promise-card">
+          <p id="promise-text">Press reveal and I will hand you one more tiny promise.</p>
+        </article>
+        <div class="bonus-actions">
+          <button id="promise-reveal" type="button" class="soft-button">Reveal Promise</button>
+          <button id="do-nothing-btn" type="button" class="soft-button">Do nothing.</button>
+        </div>
+        <p id="promise-secret" class="promise-secret">Hold the reveal button to keep this promise forever.</p>
+        <p id="do-nothing-feedback" class="bonus-subline"></p>
+      </div>
+    </section>
+
+    <section id="scratch-memory" class="story-section">
+      <div class="glass-card bonus-card">
+        <h2 class="section-title">Scratch a Memory</h2>
+        <p class="bonus-subline">Rub gently. Some lines only appear after warmth.</p>
+        <div class="scratch-wrap">
+          <p id="scratch-reveal-text" class="scratch-reveal-text">I kept this sentence hidden because it sounded too honest: I still look for you in every beautiful thing.</p>
+          <canvas id="scratch-canvas" class="scratch-canvas" aria-label="Scratch memory layer"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section id="voice-vault" class="story-section voice-vault hidden-section">
+      <div class="glass-card voice-card">
+        <h2 class="section-title">Voice Note Vault</h2>
+        <p id="voice-vault-status" class="voice-vault-status reveal-line">
+          Hidden for now. Find all 50 Easter Eggs to open this memory.
+        </p>
+
+        <div id="voice-vault-content" class="voice-vault-content hidden-panel">
+          <p class="reveal-line">
+            This part opens only for those who stayed curious long enough to find everything.
+          </p>
+          <div class="voice-actions">
+            <button id="play-voice-note" type="button" class="soft-button">Play Voice Note</button>
+            <button id="stop-voice-note" type="button" class="soft-button">Stop</button>
+          </div>
+          <p id="voice-note-caption" class="voice-note-caption"></p>
+          <p id="voice-window-timer" class="voice-window-timer"></p>
+        </div>
+
+        <div id="voice-password-panel" class="voice-password-panel hidden-panel">
+          <p class="reveal-line">
+            The temporary window has closed. Enter the remembered phrase to unlock this forever.
+          </p>
+          <div class="voice-password-controls">
+            <input id="vault-password-input" type="password" placeholder="Enter remembered phrase" aria-label="Vault password">
+            <button id="vault-password-submit" type="button" class="soft-button">Unlock Forever</button>
+          </div>
+          <p id="vault-password-feedback" class="vault-password-feedback"></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="music-bar">
+    <div class="music-meta">
+      <span class="pulse-dot" aria-hidden="true"></span>
+      <div>
+        <p class="music-label">Now playing</p>
+        <p id="music-status" class="music-status">Waiting for your passcode...</p>
+      </div>
+    </div>
+    <div class="music-controls">
+      <button id="mute-toggle" type="button" class="music-control-button">Mute</button>
+      <label for="volume-slider" class="volume-label">Volume</label>
+      <input id="volume-slider" class="volume-slider" type="range" min="0" max="100" value="80" aria-label="Music volume">
+    </div>
+    <div id="visualizer" class="visualizer" aria-hidden="true"></div>
+  </footer>
+
+  <p id="idle-message" class="idle-message"></p>
+  <div id="sweet-popup" class="sweet-popup" role="status" aria-live="polite"></div>
+  <div id="egg-feedback" class="egg-feedback" role="status" aria-live="polite"></div>
+
+  <div id="fake-loading" class="fake-overlay hidden-panel">
+    <div class="fake-card">
+      <div class="fake-spinner" aria-hidden="true"></div>
+      <p>Re-syncing stardust memories...</p>
+      <button id="fake-loading-close" type="button" class="soft-button">Continue</button>
+    </div>
+  </div>
+
+  <div id="fake-error" class="fake-overlay hidden-panel">
+    <div class="fake-card fake-error-card">
+      <p>Unexpected tenderness overflow detected.</p>
+      <p class="subtle">Tap fix if your heart can handle one more secret.</p>
+      <button id="fake-error-fix" type="button" class="soft-button">Fix it</button>
+    </div>
+  </div>
+
+  <button id="fake-bug" type="button" class="fake-bug hidden-panel" aria-label="Tiny bug">✦</button>
+
+  <div id="permanent-lock-overlay" class="permanent-lock-overlay hidden-panel">
+    <div class="permanent-lock-card">
+      <h2>Vault Permanently Locked</h2>
+      <p>The remembered phrase was incorrect. This story is sealed.</p>
+      <p class="subtle">No reset path exists in this version.</p>
+    </div>
+  </div>
+
+  <div id="fake-ending-overlay" class="fake-overlay hidden-panel">
+    <div class="fake-card">
+      <p id="fake-ending-line">
+        If this is where we stop, thank you for every soft minute. But maybe this is not really <span id="revive-word" class="revive-word">goodbye</span>.
+      </p>
+      <p class="subtle">Tap the right word if your heart disagrees.</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="special.js"></script>
+</body>
+</html>
